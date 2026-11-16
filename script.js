@@ -68,6 +68,8 @@ function validar(){
 }
 
 function limpar(){
+    let mensagem =
+        document.querySelector("#p_mensagem");
     mensagem.innerHTML = "";
 }
 
