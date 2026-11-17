@@ -65,11 +65,34 @@ function validar(){
     //Se o campo estiver sem texto, Exibir mensagem "[CAMPO] está vazio"
     //Se o campo estiver diferente da repetição, Exibir mensagem "[CAMPO]s são diferentes"
     //Se o campo estiver igual a comparação, Exibir mensagem "[CAMPO]s estão iguais"
+    let lista_tag = document.createElement("ul");
+
+function validarCampo(nome, campo, confirmacao) {
+    let item = document.createElement("li");
+
+    if (campo.value.trim() === "" || confirmacao.value.trim() === "") {
+        item.textContent = nome + " está vazio";
+        item.classList.add("erro");
+    } else if (campo.value !== confirmacao.value) {
+        item.textContent = nome + "s são diferentes";
+        item.classList.add("erro");
+    } else {
+        item.textContent = nome + "s estão iguais";
+        item.classList.add("correto");
+    }
+
+    lista_tag.appendChild(item);
+}
+
+validarCampo("E-mail", txt_email, txt_email_confirma);
+validarCampo("Celular", txt_celular, txt_celular_confirma);
+validarCampo("Senha", txt_senha, txt_confirma);
+
+mensagem.innerHTML = "";
+mensagem.appendChild(lista_tag);
 }
 
 function limpar(){
-    let mensagem =
-        document.querySelector("#p_mensagem");
     mensagem.innerHTML = "";
 }
 
@@ -84,6 +107,7 @@ function adicionar_apelido(){
     let p_lista_apelido = document.querySelector("#p_lista_apelido");
     //Alterna entre display = "none" (invisível) para display = "block" (visível)
     p_lista_apelido.style.display = "block";
+    document.querySelector("#txt_apelido").value ="";
 
     //no final, limpar a caixa de texto de apelido
 }
@@ -92,8 +116,22 @@ function gravar_apelido(){
     let apelido = document.querySelector('#lst_apelido option:checked').innerText;
 
     cookieStore.set("apelido_favorito", apelido);
+    
     //Gravar todos campos do formulário no cookie
+    let formulario = {
+        nome: document.querySelector("#txt_nome").value,
+        email: document.querySelector("#txt_email").value,
+        celular: document.querySelector("#txt_celular").value,
+        senha: document.querySelector("#txt_senha").value
+    };
+
+    cookieStore.set("formulario", JSON.stringify(formulario));
+
     //Gravar lista de apelidos no cookie
+    let apelidos = Array.from(document.querySelectorAll("#lst_apelido option"))
+        .map(opcao => opcao.textContent);
+
+    cookieStore.set("lista_apelidos", JSON.stringify(apelidos));
 }
 
 async function carregar_apelido(){
@@ -109,4 +147,11 @@ async function carregar_apelido(){
     lst_apelido.appendChild(novo_apelido);
 
     //Carregar lista de apelido
+    let apelidos = JSON.parse((await cookieStore.get("lista_apelidos")).value);
+
+apelidos.forEach(function(apelido){
+    let novo_apelido = document.createElement("option");
+    novo_apelido.textContent = apelido;
+    lst_apelido.appendChild(novo_apelido);
+});
 }
